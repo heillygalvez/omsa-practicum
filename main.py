@@ -27,7 +27,7 @@ st.plotly_chart(cip_hist_fig2, use_container_width=True)
 
 ######################################################################3
 st.markdown("## 2. Distribution of Industries")
-st.markdown("Hires, Separations and Wages")
+st.markdown("Hires and Separations")
 
 industry_year = st.selectbox("Year", list(range(2000,2026)))
 
