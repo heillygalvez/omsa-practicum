@@ -50,9 +50,5 @@ separations_agg = separations_agg[separations_agg['value']<100000]
 separations_hist_fig = px.histogram(separations_agg, nbins=20, x='value', title=f"Count of Industries by # of Separations").update_layout(xaxis_title="Separations")
 st.plotly_chart(separations_hist_fig, use_container_width=True)
 
-
 ######################################################################3
-st.markdown("## 3. UOA Clusters")
-st.markdown("CIP vs. SOC Relaltionships")
-
 
