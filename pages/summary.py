@@ -10,8 +10,7 @@ st.markdown("## 1. Distribution of Programs")
 st.markdown("Total completions and institutions")
 cip_year = st.selectbox("Year", list(range(2014,2024)))
 def load_completions_data(path: str, year = 2023):
-    data = pd.read_csv(path+f"c{year}_a.csv")
-    data = data[['CIPCODE','CTOTALT','UNITID']]
+    data = pd.read_csv(path+f"c{year}_a.csv", usecols=['CIPCODE','CTOTALT','UNITID'])
     return data
 completions = load_completions_data("./data/completions/", cip_year)
 
