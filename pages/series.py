@@ -1,18 +1,20 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from itertools import cycle, chain
 
-st.markdown('# Units of Analysis over the Years')
-st.write("We grouped educational programs and occupations (by their CIP and SOC codes, respectively) into Units of Analysis to facilitate interaction with their supply and demand indicators.")
-
+st.markdown('# Supply and Demand Over Time')
+st.markdown("As we focus on a specific Unit of Analysis, we can compare the different supply and demand indicators for the units education programs and industries/occupations.")
+         
 # Load uoa_todata
 uoa_df = pd.read_json('./data/codes/uoa.json')
 
 # Enable selection of one UOA
+selected_uoa_index = 0
+if 'uoa' in st.session_state:
+    selected_uoa_index = st.session_state.uoa
 uoa_indices = list(uoa_df['idx'])
 uoa_names = [row['socs'][0]['name'] for _,row in uoa_df.iterrows()]
-uoa = st.selectbox("Choose a Unit of Analysis", uoa_names, index=40) #TODO: use navigation parameters
+uoa = st.selectbox("Choose a Unit of Analysis", uoa_names, index=selected_uoa_index)
 years = list(range(2014,2024))
 
 # Load all completions data

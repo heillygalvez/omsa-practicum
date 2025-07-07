@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.markdown("# Data and Summary Stats")
+st.title("Economic Development and Employer Planning System")
 st.set_page_config(page_title= "EPEDS Home")
 
 #####################################################################3
@@ -52,3 +52,19 @@ st.plotly_chart(separations_hist_fig, use_container_width=True)
 
 ######################################################################3
 
+# TODO: Add lots of metric cards:
+#'''
+#  Total count of CIP codes
+#  Total completions/institutions
+#  Average number of completions/institutions per CIP
+#  Median
+#  Max number of completions and institutions
+#  Min number of completions/ institutions
+
+#  Total count of industries
+#  Tocal hires/separations
+#  Average
+#  Median
+#  Max
+#  Min
+# '''

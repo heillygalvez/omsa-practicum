@@ -12,7 +12,7 @@ df = pd.read_json('./data/codes/uoa.json')
 # Prep columns
 df.loc[:, 'n_cips'] = df.apply(lambda x: len(x.loc['cips']), axis=1)
 df.loc[:, 'n_socs'] = df.apply(lambda x: len(x.loc['socs']), axis=1)
-df.loc[:, 'UOA'] = df.apply(lambda x: x.loc['cips'][0]['name'], axis=1)
+df.loc[:, 'UOA'] = df.apply(lambda x: x.loc['socs'][0]['name'], axis=1)
 
 # Render scatterplot of UOAs
 selection = st.dataframe(df[['UOA', 'n_cips', 'n_socs']], selection_mode="single-row", on_select="rerun",hide_index=True)
@@ -28,9 +28,14 @@ if selection.selection.rows:
     arr1 = [f'{cip['code']}: {cip['name']}' for cip in df.iloc[selection.selection.rows[0]]['cips']]
     arr2 = [f'{soc['code']}: {soc['name']}' for soc in df.iloc[selection.selection.rows[0]]['socs']]
     data = zip_longest(arr1, arr2)
-    title = df.iloc[selection.selection.rows[0], :]['UOA']
+    selection_idx = selection.selection.rows[0]
+    title = df.iloc[selection_idx, :]['UOA']
     table = pd.DataFrame(data, columns=['CIP codes', 'SOC codes'])
     st.markdown(f'#### {title}')
+    def set_uoa():
+        st.session_state.uoa = selection_idx
+    if st.button("See UOA over Time", on_click=set_uoa):
+        st.switch_page("./pages/series.py")
     st.dataframe(table, hide_index=True)
 
 #TODO: Make the first SOC the name of the UOA instead

@@ -1,20 +1,25 @@
 import streamlit as st
 
-summary_page = st.Page("./pages/summary.py", title="CIP and SOC Stats", icon= "📊")
-uoa_page = st.Page("./pages/uoa.py", title="Understanding UOAs", icon="🔍")
-series_page = st.Page("./pages/series.py", title="UOAs over Time", icon="📈")
-supply_page = st.Page("./pages/supply.py", title="Supply Forecast", icon="🎲")
-demand_page = st.Page("./pages/demand.py", title="Demand Forecast", icon="🔮")
+summary_page = st.Page("./pages/summary.py", title="EPEDS Home", icon= "📊")
+uoa_page = st.Page("./pages/uoa.py", title="UOA Overview", icon="🔍")
+series_page = st.Page("./pages/series.py", title="Supply and Demand", icon="📈")
+forecast_page = st.Page("./pages/forecast.py", title="Forecast", icon="🔮")
 
 pg = st.navigation(
         {
-            "Summary": [summary_page],
-            "Units of Analysis": [uoa_page, series_page],
-            "Forecasts": [supply_page, demand_page]
+            "Home": [summary_page],
+            "Units of Analysis": [uoa_page, series_page, forecast_page],
         }
     )
 pg.run()
 
 
+# FUTURE:
+# '''
+#  Manually organize "no-match" between crosswalk
+#  Use LLM to name UOA's more intuitively
+#  Use additional data to train forecast (requirements, job dynamics, demographics)
+# '''
 
-
+# TODO: Make layout more grid-like
+# TODO: Sort UOA alphabetically
