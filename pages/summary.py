@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.write("SUMMARY STATS")
+st.markdown("# Data and Summary Stats")
 st.set_page_config(page_title= "EPEDS Home")
 
 #####################################################################3

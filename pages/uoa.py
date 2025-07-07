@@ -34,3 +34,4 @@ if selection.selection.rows:
     st.dataframe(table, hide_index=True)
 
 #TODO: Make the first SOC the name of the UOA instead
+#TODO: # of Completions vs # of occupations in last year (metrics, scatter, bar charts for shares)
