@@ -50,4 +50,12 @@ st.plotly_chart(completions_fig, use_container_width=True)
 st.plotly_chart(institutions_fig, use_container_width=True)
 
 #goal
-# df with uoa, year, #completions
+hires = pd.read_csv("./data/employment/hires.txt", sep="\t")
+separations = pd.read_csv("./data/employment/separations.txt", sep="\t")
+wages = pd.read_csv("./data/employment/oe_data_1_AllData.txt", sep="\t")
+wages = wages[wages['series_id'].str[-2:]=="17"] #Select only Annual median wage values
+st.dataframe(wages.tail())
+
+#TODO upload complete wages from website https://www.bls.gov/oes/tables.htm
+# Finish 2 line charts for demand. 1 with hires+ separations. One with wages.
+
