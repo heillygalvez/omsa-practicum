@@ -81,7 +81,7 @@ for year in years:
     socs = [obj['code'] for obj in uoa_df['socs'][uoa_idx]]
     aoi = wages[wages['OCC_CODE'].isin(socs)]
     aoi = aoi[aoi['year']==year]
-    wages_avg = aoi[['A_MEDIAN']].mean()
+    wages_avg = aoi['A_MEDIAN'].mean()
     wages_avgs.append(wages_avg)
     tot_emp_sum = aoi['TOT_EMP'].sum()
     tot_emp_sums.append(tot_emp_sum)
