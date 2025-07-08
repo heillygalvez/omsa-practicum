@@ -42,7 +42,7 @@ st.plotly_chart(hires_hist_fig, use_container_width=True)
 
 separations = pd.read_csv("./data/employment/separations.txt", sep="\t")
 separations_agg = separations[separations['year'] == industry_year]
-separations_agg['industry_code'] = separations_agg['series_id'].str[3:9]
+separations_agg.loc[:,'industry_code'] = separations_agg['series_id'].str[3:9]
 separations_agg = separations_agg[separations_agg['series_id'].str[-1] == "L"]
 separations_agg = separations_agg.groupby(['industry_code'], as_index=False)['value'].sum()
 separations_agg = separations_agg[separations_agg['value']<100000] 

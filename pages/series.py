@@ -47,14 +47,7 @@ agg_completions_df = pd.DataFrame(agg_completions, columns=['year', 'completions
 completions_fig = px.line(agg_completions_df, x='year', y='completions')
 institutions_fig = px.line(agg_completions_df, x='year', y='institutions')
 
-st.plotly_chart(completions_fig, use_container_width=True)
-st.plotly_chart(institutions_fig, use_container_width=True)
-
 ############################################################3
-
-# Load all hire and separations data (JL series)
-hires = pd.read_csv("./data/employment/hires.txt", sep="\t")
-separations = pd.read_csv("./data/employment/separations.txt", sep="\t")
 
 # Load all wage data (OE series)
 @st.cache_data
@@ -88,10 +81,48 @@ for year in years:
 agg_emps = zip(years, wages_avgs, tot_emp_sums)
 agg_emps_df = pd.DataFrame(agg_emps, columns=['year', 'average_annual_wage', 'total_national_employment'])
 
-# Plot employment charts
-wages_fig = px.line(agg_emps_df, x='year', y='average_annual_wage')
-emps_fig = px.line(agg_emps_df, x='year', y='total_national_employment')
+##############################################################################
 
+# Moving average forecasts
+window = st.selectbox("Choose a window:", [2,3,4,5], index=1)
+
+def get_predictions(df, columns):
+    predictions = []
+    for col in columns:
+        y =df[col]
+        last_year = list(df['year'])[-1]
+        future_xs = list(range(last_year,last_year+window+1)) 
+        future_ys = [list(y)[-1]]
+        for _ in range(window):
+            y_pred = list(y.rolling(window=window).mean())
+            y = list(y)
+            future_ys.append(y_pred[-1])
+            y.append(y_pred[-1])
+            y = pd.Series(y)
+        predictions.append(future_ys)
+    new_rows = zip(future_xs, *predictions)
+    return pd.DataFrame(new_rows, columns=df.columns)
+
+# Make predictions
+completions_preds_df = get_predictions(agg_completions_df, ['completions', 'institutions'])
+completions_preds_df.loc[:,'obs_pred'] = 'pred'
+agg_completions_df.loc[:,'obs_pred'] = 'obs'
+supply_series = pd.concat([completions_preds_df, agg_completions_df])
+
+wages_preds_df = get_predictions(agg_emps_df, ['average_annual_wage', 'total_national_employment'])
+wages_preds_df.loc[:,'obs_pred'] = 'pred'
+agg_emps_df.loc[:,'obs_pred'] = 'obs'
+demand_series = pd.concat([wages_preds_df, agg_emps_df])
+
+
+# Plot charts
+completions_fig = px.line(supply_series, x='year', y='completions', color='obs_pred', markers=True)
+institutions_fig = px.line(supply_series, x='year', y='institutions', color='obs_pred', markers=True)
+st.plotly_chart(completions_fig, use_container_width=True)
+st.plotly_chart(institutions_fig, use_container_width=True)
+
+wages_fig = px.line(demand_series, x='year', y='average_annual_wage', color='obs_pred', markers=True)
+emps_fig = px.line(demand_series, x='year', y='total_national_employment', color='obs_pred', markers=True)
 st.plotly_chart(wages_fig, use_container_width=True)
 st.plotly_chart(emps_fig, use_container_width=True)
 
