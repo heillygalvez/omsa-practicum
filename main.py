@@ -3,12 +3,11 @@ import streamlit as st
 summary_page = st.Page("./pages/summary.py", title="EPEDS Home", icon= "📊")
 uoa_page = st.Page("./pages/uoa.py", title="UOA Overview", icon="🔍")
 series_page = st.Page("./pages/series.py", title="Supply and Demand", icon="📈")
-forecast_page = st.Page("./pages/forecast.py", title="Forecast", icon="🔮")
 
 pg = st.navigation(
         {
             "Home": [summary_page],
-            "Units of Analysis": [uoa_page, series_page, forecast_page],
+            "Units of Analysis": [uoa_page, series_page],
         }
     )
 pg.run()
