@@ -1,5 +1,7 @@
 import streamlit as st
 
+st.set_page_config(layout="wide")
+
 summary_page = st.Page("./pages/summary.py", title="EPEDS Home", icon= "📊")
 uoa_page = st.Page("./pages/uoa.py", title="UOA Overview", icon="🔍")
 series_page = st.Page("./pages/series.py", title="Supply and Demand", icon="📈")
