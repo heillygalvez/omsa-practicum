@@ -8,14 +8,18 @@ st.set_page_config(page_title= "EPEDS Home")
 
 header = st.container()
 header.markdown("# Economic Development and Employer Planning System (EDEPS) Interactive Dashboard")
-header.markdown("???")
+header.markdown("This EPEDS dashboard helps you understand available educational program (supply) and employment (demand) "\
+                "data available (in this case, yearly values from 2014 to 2023 for both supply and demand), and explore values that indicate changes over time that are relevant to academic and market planing.")
 body = st.container()
 left_side, right_side = body.columns(2)
 
 #####################################################################
 
 left_side.markdown("## Supply Data")
-left_side.markdown("???")
+left_side.markdown("The data summarized below comes from the Integrated Postsecondary Education Data System (IPEDS) completions data "\
+                   "which reports the number of postsecondary awards (completions) according to the field of study, designated by a "\
+                    "variety of demographic and institutional characteristics. For our purposes we are interested in the completions' "\
+                    "Classification of Instructional Programs (CIP) code and the ID's of the institutions offering programs in such fields of study.")
 
 right_side.markdown("## Demand Data")
 right_side.markdown("???")
@@ -23,7 +27,7 @@ right_side.markdown("???")
 #####################################################################
 
 #Load supply data
-cip_year = left_side.selectbox("Year", list(range(2014,2024)))
+cip_year = left_side.slider("Year", min_value=2014, max_value=2023, value=2023, key="cip_year")
 
 def load_completions_data(path: str, year = 2023):
     data = pd.read_csv(path+f"c{year}_a.csv", usecols=['CIPCODE','CTOTALT','UNITID'])
@@ -44,9 +48,9 @@ cip_hist_fig2 = px.histogram(code_institutions, x='UNITID', nbins=15, title="Cou
 
 left_metrics = left_side.container()
 lm1, lm2, lm3 = left_metrics.columns(3)
-lm1.metric(label="Total CIP codes", value="???")
-lm2.metric(label="Completions Median", value="???")
-lm3.metric(label="Institutions Count Median", value="???")
+lm1.metric(label="Total CIP codes", value='{:,}'.format(code_completions['CIPCODE'].nunique()), border=True)
+lm2.metric(label="Completions Median", value='{:,}'.format(code_completions['CTOTALT'].median()), border=True)
+lm3.metric(label="Institutions Count Median", value='{:,}'.format(code_institutions['UNITID'].median()), border=True)
 
 left_charts = left_side.container()
 lc1, lc2 = left_charts.columns(2)
@@ -55,27 +59,29 @@ lc2.plotly_chart(cip_hist_fig2, use_container_width=True)
 
 #####################################################################
 
-industry_year = right_side.selectbox("Year", list(range(2000,2026)))
+industry_year = right_side.slider("Year", min_value=2014, max_value=2023, value=2023, key="industry_year")
 
 #Load demand data
-hires = pd.read_csv("./data/employment/hires.txt", sep="\t")
 
-#Total hires by industry
-hires_agg = hires[hires['year'] == industry_year]
-hires_agg['industry_code'] = hires_agg['series_id'].str[3:9]
-hires_agg = hires_agg[hires_agg['series_id'].str[-1] == "L"]
-hires_agg = hires_agg.groupby(['industry_code'], as_index=False)['value'].sum()
-hires_agg = hires_agg[hires_agg['value'] < 100000]
-hires_hist_fig = px.histogram(hires_agg, nbins=20, x='value', title=f"Count of Industries by # of Hires").update_layout(xaxis_title="Hires")
+def load_employment_data(path: str, year):
+    data = pd.read_excel(path+f"national_M{year}_dl.xlsx", usecols=['OCC_CODE', 'H_MEDIAN', 'A_MEDIAN', 'TOT_EMP'])
+    return data
+employments = load_employment_data("./data/employment/", industry_year)
 
-#Total separations by industry
-separations = pd.read_csv("./data/employment/separations.txt", sep="\t")
-separations_agg = separations[separations['year'] == industry_year]
-separations_agg.loc[:,'industry_code'] = separations_agg['series_id'].str[3:9]
-separations_agg = separations_agg[separations_agg['series_id'].str[-1] == "L"]
-separations_agg = separations_agg.groupby(['industry_code'], as_index=False)['value'].sum()
-separations_agg = separations_agg[separations_agg['value']<100000] 
-separations_hist_fig = px.histogram(separations_agg, nbins=20, x='value', title=f"Count of Industries by # of Separations").update_layout(xaxis_title="Separations")
+# Impute annual wages with hourly
+imputed_employments = employments.copy()
+imputed_employments["A_MEDIAN"] = imputed_employments.apply(lambda row: row["A_MEDIAN"] if row["A_MEDIAN"] != "*" else row["H_MEDIAN"] * 2080, axis=1)
+imputed_employments = imputed_employments[imputed_employments['A_MEDIAN'] != "#"]
+
+
+# Total completions by CIP code
+code_wages = imputed_employments.groupby(['OCC_CODE'], as_index=False)['A_MEDIAN'].mean()
+soc_hist_fig1 = px.histogram(code_wages, x='A_MEDIAN', nbins=25, title="Count of SOC codes by mean wages").update_layout(xaxis_title="")
+
+#CIP # of institutions offering program
+code_employments = imputed_employments.groupby(['OCC_CODE'], as_index=False)['TOT_EMP'].sum()
+soc_hist_fig2 = px.histogram(code_employments, x='TOT_EMP', nbins=15, title="Count of SOC codes by Employment Level").update_layout(xaxis_title="")
+
 
 ######################################################################3
 
@@ -87,8 +93,8 @@ rm3.metric(label="Median Wage", value="???")
 
 right_charts = right_side.container()
 rc1, rc2 = right_charts.columns(2)
-rc1.plotly_chart(hires_hist_fig, use_container_width=True)
-rc2.plotly_chart(separations_hist_fig, use_container_width=True)
+rc1.plotly_chart(soc_hist_fig1, use_container_width=True)
+rc2.plotly_chart(soc_hist_fig2, use_container_width=True)
 
 
 # TODO: Add lots of metric cards:
